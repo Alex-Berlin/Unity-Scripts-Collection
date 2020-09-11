@@ -9,6 +9,8 @@ public class RobustMusicPlayer : MonoBehaviour
     shuffle and repeat entire playlists 
     and tracks from playlists and control the music volume.
 
+    You want to control Looping and PlayOnAwake using variables IN THE SCRIPT, not on the AudioSource component.
+
     Following functions are all public
     and meant to be called from other scripts
     or added as listeners to events as needed:
@@ -23,9 +25,9 @@ public class RobustMusicPlayer : MonoBehaviour
     */
 
     [Header("Setup")]
-    [SerializeField] bool isRandomOrder = true;
-    [SerializeField] bool isLooped = true;
-    [SerializeField] bool isPlaying = false;
+    public bool isRandomOrder = true;
+    public bool isLooped = true;
+    public bool isPlaying = false;
     AudioSource audioSource;
     [Header("Track List")]
     [SerializeField] List<AudioClip> playlist;
@@ -56,29 +58,42 @@ public class RobustMusicPlayer : MonoBehaviour
             playlist[i] = cachedSong;
         }
     }
+    /// <summary>
+    /// Stops the music playing and goes back to the first track in playlist.
+    /// </summary>
     public void Restart()
     {
         audioSource.Stop();
         isPlaying = false;
         currentTrackIndex = 0;
     }
+    /// <summary>
+    /// Stops the player.
+    /// </summary>
     public void Stop()
     {
         audioSource.Stop();
         isPlaying = false;
     }
-    public void Pause()
+    /*public void Pause()
     {
         audioSource.Pause();
         isPlaying = false;
         throw new System.NotImplementedException("Pause functionality in the works");
-    }
+    }*/
     
+    /// <summary>
+    /// Starts the player on current song.
+    /// </summary>
     public void Play()
     {
         audioSource.PlayOneShot(playlist[currentTrackIndex]);
         isPlaying = true;
     }
+    /// <summary>
+    /// Starts the player on indexed song in playlist.
+    /// </summary>
+    /// <param name="index"></param>
     public void Play(int index)
     {
         audioSource.Stop();
@@ -86,23 +101,38 @@ public class RobustMusicPlayer : MonoBehaviour
         currentTrackIndex = index;
         Play();
     }
+    /// <summary>
+    /// Starts the player.
+    /// </summary>
+    /// <param name="clip"></param>
     public void Play(AudioClip clip)
     {
         audioSource.Stop();
         isPlaying = true;
         audioSource.PlayOneShot(clip);
     }
+    /// <summary>
+    /// Plays next song in playlist.
+    /// </summary>
     public void PlayNext()
     {
         audioSource.Stop();
         currentTrackIndex = currentTrackIndex == playlist.Count - 1 ? 0 : currentTrackIndex + 1;
         Play();
     }
+    /// <summary>
+    /// Plays previous song in playlist.
+    /// </summary>
     public void PlayPrevious()
     {
         audioSource.Stop();
         currentTrackIndex = currentTrackIndex == 0 ? playlist.Count - 1 : currentTrackIndex - 1;
         Play();
+    }
+
+    public void AddToPlaylist(AudioClip clip)
+    {
+        playlist.Add(clip);
     }
 
     /// <summary>
@@ -116,6 +146,9 @@ public class RobustMusicPlayer : MonoBehaviour
             currentTrackIndex++;
             if (currentTrackIndex >= playlist.Count)
             {
+                if (isRandomOrder)
+                    Shuffle();
+
                 if (isLooped)
                     currentTrackIndex = 0;
                 else
@@ -126,6 +159,9 @@ public class RobustMusicPlayer : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Keyboard controls used for testing, you don't need those.
+    /// </summary>
     private void TestingControls()
     {
         // Play|Stop on SPACE, Shuffle on S, Restart on R, Pause on P, 
@@ -148,7 +184,7 @@ public class RobustMusicPlayer : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.P))
         {
-            Pause();
+            //Pause();
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
