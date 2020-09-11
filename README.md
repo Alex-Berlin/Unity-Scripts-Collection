@@ -7,3 +7,6 @@ Script for playlist management. You want a lot different tracks to play during g
 
 ### ObjectPooler
 Flexible script for object pooling. Useful for bullets, enemies, everything, basically. Based on script from //video// tutorial.
+
+### VolumeSlider
+Simple hook and play script for using sliders to manage mixer volume. Needs a little setting up before using, look up the script for detailed instructions.
