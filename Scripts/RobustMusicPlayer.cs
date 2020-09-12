@@ -28,9 +28,11 @@ public class RobustMusicPlayer : MonoBehaviour
     public bool isRandomOrder = true;
     public bool isLooped = true;
     public bool isPlaying = false;
+    private bool isPaused = false;
     AudioSource audioSource;
     [Header("Track List")]
     [SerializeField] List<AudioClip> playlist;
+    public AudioClip addClip;
     AudioClip currentTrack;
     int currentTrackIndex = 0;
 
@@ -64,6 +66,7 @@ public class RobustMusicPlayer : MonoBehaviour
     public void Restart()
     {
         audioSource.Stop();
+        isPaused = false;
         isPlaying = false;
         currentTrackIndex = 0;
     }
@@ -74,20 +77,32 @@ public class RobustMusicPlayer : MonoBehaviour
     {
         audioSource.Stop();
         isPlaying = false;
+        isPaused = false;
     }
-    /*public void Pause()
+    /// <summary>
+    /// Pauses the current track.
+    /// </summary>
+    public void Pause()
     {
         audioSource.Pause();
         isPlaying = false;
-        throw new System.NotImplementedException("Pause functionality in the works");
-    }*/
+        isPaused = true;
+    }
     
     /// <summary>
     /// Starts the player on current song.
     /// </summary>
     public void Play()
     {
-        audioSource.PlayOneShot(playlist[currentTrackIndex]);
+        if (!isPaused)
+        {
+            audioSource.PlayOneShot(playlist[currentTrackIndex]);
+        }
+        else
+        {
+            audioSource.Play();
+            isPaused = false;
+        }
         isPlaying = true;
     }
     /// <summary>
@@ -97,6 +112,7 @@ public class RobustMusicPlayer : MonoBehaviour
     public void Play(int index)
     {
         audioSource.Stop();
+        isPaused = false;
         isPlaying = true;
         currentTrackIndex = index;
         Play();
@@ -108,6 +124,7 @@ public class RobustMusicPlayer : MonoBehaviour
     public void Play(AudioClip clip)
     {
         audioSource.Stop();
+        isPaused = false;
         isPlaying = true;
         audioSource.PlayOneShot(clip);
     }
@@ -116,6 +133,7 @@ public class RobustMusicPlayer : MonoBehaviour
     /// </summary>
     public void PlayNext()
     {
+        isPaused = false;
         audioSource.Stop();
         currentTrackIndex = currentTrackIndex == playlist.Count - 1 ? 0 : currentTrackIndex + 1;
         Play();
@@ -125,14 +143,34 @@ public class RobustMusicPlayer : MonoBehaviour
     /// </summary>
     public void PlayPrevious()
     {
+        isPaused = false;
         audioSource.Stop();
         currentTrackIndex = currentTrackIndex == 0 ? playlist.Count - 1 : currentTrackIndex - 1;
         Play();
     }
 
+    /// <summary>
+    /// Adds the song to playlist.
+    /// </summary>
+    /// <param name="clip"></param>
     public void AddToPlaylist(AudioClip clip)
     {
         playlist.Add(clip);
+    }
+    /// <summary>
+    /// Removes indexed song from playlist.
+    /// </summary>
+    /// <param name="index"></param>
+    public void RemoveFromPlaylist(int index)
+    {
+        if (currentTrackIndex == index)
+        {
+            if (isPlaying)
+                PlayNext();
+            else
+                currentTrackIndex = currentTrackIndex == playlist.Count - 1 ? 0 : currentTrackIndex + 1;
+        }
+        playlist.RemoveAt(index);
     }
 
     /// <summary>
@@ -140,6 +178,11 @@ public class RobustMusicPlayer : MonoBehaviour
     /// </summary>
     private void Controller()
     {
+        if (playlist.Count <= 0)
+        {
+            Stop();
+            return;
+        }
         Mathf.Clamp(currentTrackIndex, 0, playlist.Count - 1);
         if (isPlaying && !audioSource.isPlaying)
         {
@@ -184,7 +227,7 @@ public class RobustMusicPlayer : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.P))
         {
-            //Pause();
+            Pause();
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -202,12 +245,25 @@ public class RobustMusicPlayer : MonoBehaviour
         {
             Play(2);
         }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            AddToPlaylist(addClip);
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            RemoveFromPlaylist(currentTrackIndex);
+        }
     }
 
     private void Update()
     {
         Controller();
+        TestingControls();
     }
+
+    // TODO:
+    // Pause functionality
+    // Playlist removal indexing fix
 
 
 
