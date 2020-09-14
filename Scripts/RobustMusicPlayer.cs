@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class RobustMusicPlayer : MonoBehaviour
 {
+    #region Instructions
     /* 
     This is a music player script wich allows you to easily play, 
     shuffle and repeat entire playlists 
@@ -22,30 +23,73 @@ public class RobustMusicPlayer : MonoBehaviour
     Restart() stops the current track and resets the playlist to the beggining.
     Shuffle() randomises playlist order when called.
     Stop() stops the current track, Pause() pauses it.
+    AddToPlaylist(AudioClip clip) adds track to the end of playlist, RemoveFromPlaylist(int index) removes track on index.
     */
+    #endregion
 
     [Header("Setup")]
-    public bool isRandomOrder = true;
-    public bool isLooped = true;
-    public bool isPlaying = false;
-    private bool isPaused = false;
-    AudioSource audioSource;
+    public bool playOnAwake = true; //Starts playing music as soon as scene is loaded.
+    public bool autoShuffle = true; //Automatically shuffles playlist on scene load and playlist completion.
+    public bool isLooped = true; //Starts playing playlist from beggining then final track is finished.
+
     [Header("Track List")]
     [SerializeField] List<AudioClip> playlist;
-    public AudioClip addClip;
-    AudioClip currentTrack;
-    int currentTrackIndex = 0;
 
+    #region Private variables, you probably don't need those
+    private AudioSource audioSource;
+    private bool isPlaying = false;
+    private bool isPaused = false;
+    private AudioClip currentTrack;
+    private int currentTrackIndex = 0;
+    #endregion
+
+    #region Logic
     private void Awake()
     {
         TryGetComponent<AudioSource>(out audioSource);
         audioSource.loop = false;
         audioSource.playOnAwake = false;
         audioSource.Stop();
-        if (isRandomOrder)
+        if (autoShuffle)
             Shuffle();
+        if (playOnAwake)
+            isPlaying = true;
     }
+    private void Update()
+    {
+        Controller();
+    }
+    /// <summary>
+    /// Main logic is contained here.
+    /// </summary>
+    private void Controller()
+    {
+        currentTrackIndex = Mathf.Clamp(currentTrackIndex, 0, playlist.Count - 1);
+        if (playlist.Count <= 0)
+        {
+            Stop();
+            return;
+        }
+        if (isPlaying && !audioSource.isPlaying)
+        {
+            currentTrackIndex++;
+            if (currentTrackIndex >= playlist.Count)
+            {
+                if (autoShuffle)
+                    Shuffle();
 
+                if (isLooped)
+                    currentTrackIndex = 0;
+                else
+                    isPlaying = false;
+            }
+            currentTrack = playlist[currentTrackIndex];
+            audioSource.PlayOneShot(currentTrack);
+        }
+    }
+    #endregion
+
+    #region Methods, use this for controls
     /// <summary>
     /// Shuffles the playlist using Fisher–Yates shuffle.
     /// </summary>
@@ -100,7 +144,7 @@ public class RobustMusicPlayer : MonoBehaviour
         }
         else
         {
-            audioSource.Play();
+            audioSource.UnPause();
             isPaused = false;
         }
         isPlaying = true;
@@ -148,7 +192,6 @@ public class RobustMusicPlayer : MonoBehaviour
         currentTrackIndex = currentTrackIndex == 0 ? playlist.Count - 1 : currentTrackIndex - 1;
         Play();
     }
-
     /// <summary>
     /// Adds the song to playlist.
     /// </summary>
@@ -172,98 +215,10 @@ public class RobustMusicPlayer : MonoBehaviour
         }
         playlist.RemoveAt(index);
     }
+    #endregion
 
-    /// <summary>
-    /// Main logic is contained here.
-    /// </summary>
-    private void Controller()
-    {
-        if (playlist.Count <= 0)
-        {
-            Stop();
-            return;
-        }
-        Mathf.Clamp(currentTrackIndex, 0, playlist.Count - 1);
-        if (isPlaying && !audioSource.isPlaying)
-        {
-            currentTrackIndex++;
-            if (currentTrackIndex >= playlist.Count)
-            {
-                if (isRandomOrder)
-                    Shuffle();
 
-                if (isLooped)
-                    currentTrackIndex = 0;
-                else
-                    isPlaying = false;
-            }
-            currentTrack = playlist[currentTrackIndex];
-            audioSource.PlayOneShot(currentTrack);
-        }
-    }
 
-    /// <summary>
-    /// Keyboard controls used for testing, you don't need those.
-    /// </summary>
-    private void TestingControls()
-    {
-        // Play|Stop on SPACE, Shuffle on S, Restart on R, Pause on P, 
-        //Right|Left for PlayNext and Previous, 
-        //1 and 2 for playing first and second song in list.
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (isPlaying)
-                Stop();
-            else
-                Play();
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            Shuffle();
-        }
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            Restart();
-        }
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            Pause();
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            PlayNext();
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            PlayPrevious();
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            Play(1);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            Play(2);
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            AddToPlaylist(addClip);
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            RemoveFromPlaylist(currentTrackIndex);
-        }
-    }
-
-    private void Update()
-    {
-        Controller();
-        TestingControls();
-    }
-
-    // TODO:
-    // Pause functionality
-    // Playlist removal indexing fix
 
 
 
