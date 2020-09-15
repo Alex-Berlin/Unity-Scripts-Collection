@@ -91,11 +91,11 @@ public class RobustMusicPlayer : MonoBehaviour
 
     #region Methods, use this for controls
     /// <summary>
-    /// Shuffles the playlist using Fisher–Yates shuffle.
+    /// Shuffles the playlist.
     /// </summary>
     public void Shuffle()
     {
-        // swaps each track in playlist with another random track.
+        // Using Fisher–Yates shuffle swaps each track in playlist with another random track.
         for (int i = 0; i < playlist.Count; i++)
         {
             int randomIndex = Random.Range(0, playlist.Count - 1);
@@ -212,6 +212,10 @@ public class RobustMusicPlayer : MonoBehaviour
                 PlayNext();
             else
                 currentTrackIndex = currentTrackIndex == playlist.Count - 1 ? 0 : currentTrackIndex + 1;
+        } else if(index < 0 || index >= playlist.Count)
+        {
+            print($"Index [{index}] is out of bounds.");
+            return;
         }
         playlist.RemoveAt(index);
     }
