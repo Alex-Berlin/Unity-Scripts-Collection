@@ -2,12 +2,13 @@
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
-public class RobustMusicPlayer : MonoBehaviour
+public class MusicPlaylistManager : MonoBehaviour
 {
     #region Instructions
-    /* 
-    This is a music player script wich allows you to easily play, 
-    shuffle and repeat entire playlists 
+
+    /*
+    This is a music player script wich allows you to easily play,
+    shuffle and repeat entire playlists
     and tracks from playlists and control the music volume.
 
     You want to control Looping and PlayOnAwake using variables IN THE SCRIPT, not on the AudioSource component.
@@ -15,7 +16,7 @@ public class RobustMusicPlayer : MonoBehaviour
     Following functions are all public
     and meant to be called from other scripts
     or added as listeners to events as needed:
-    
+
     Play() starts playing the current track.
     Play(int index) plays specific track in playlist.
     Play(AudioClip clip) plays specific track.
@@ -25,7 +26,8 @@ public class RobustMusicPlayer : MonoBehaviour
     Stop() stops the current track, Pause() pauses it.
     AddToPlaylist(AudioClip clip) adds track to the end of playlist, RemoveFromPlaylist(int index) removes track on index.
     */
-    #endregion
+
+    #endregion Instructions
 
     [Header("Setup")]
     public bool playOnAwake = true; //Starts playing music as soon as scene is loaded.
@@ -33,17 +35,20 @@ public class RobustMusicPlayer : MonoBehaviour
     public bool isLooped = true; //Starts playing playlist from beggining then final track is finished.
 
     [Header("Track List")]
-    [SerializeField] List<AudioClip> playlist;
+    [SerializeField] private List<AudioClip> playlist = null;
 
     #region Private variables, you probably don't need those
+
     private AudioSource audioSource;
     private bool isPlaying = false;
     private bool isPaused = false;
     private AudioClip currentTrack;
     private int currentTrackIndex = 0;
-    #endregion
+
+    #endregion Private variables, you probably don't need those
 
     #region Logic
+
     private void Awake()
     {
         TryGetComponent<AudioSource>(out audioSource);
@@ -55,10 +60,12 @@ public class RobustMusicPlayer : MonoBehaviour
         if (playOnAwake)
             isPlaying = true;
     }
+
     private void Update()
     {
         Controller();
     }
+
     /// <summary>
     /// Main logic is contained here.
     /// </summary>
@@ -87,9 +94,11 @@ public class RobustMusicPlayer : MonoBehaviour
             audioSource.PlayOneShot(currentTrack);
         }
     }
-    #endregion
+
+    #endregion Logic
 
     #region Methods, use this for controls
+
     /// <summary>
     /// Shuffles the playlist.
     /// </summary>
@@ -104,6 +113,7 @@ public class RobustMusicPlayer : MonoBehaviour
             playlist[i] = cachedSong;
         }
     }
+
     /// <summary>
     /// Stops the music playing and goes back to the first track in playlist.
     /// </summary>
@@ -114,6 +124,7 @@ public class RobustMusicPlayer : MonoBehaviour
         isPlaying = false;
         currentTrackIndex = 0;
     }
+
     /// <summary>
     /// Stops the player.
     /// </summary>
@@ -123,6 +134,7 @@ public class RobustMusicPlayer : MonoBehaviour
         isPlaying = false;
         isPaused = false;
     }
+
     /// <summary>
     /// Pauses the current track.
     /// </summary>
@@ -132,7 +144,7 @@ public class RobustMusicPlayer : MonoBehaviour
         isPlaying = false;
         isPaused = true;
     }
-    
+
     /// <summary>
     /// Starts the player on current song.
     /// </summary>
@@ -149,6 +161,7 @@ public class RobustMusicPlayer : MonoBehaviour
         }
         isPlaying = true;
     }
+
     /// <summary>
     /// Starts the player on indexed song in playlist.
     /// </summary>
@@ -161,6 +174,7 @@ public class RobustMusicPlayer : MonoBehaviour
         currentTrackIndex = index;
         Play();
     }
+
     /// <summary>
     /// Starts the player.
     /// </summary>
@@ -172,6 +186,7 @@ public class RobustMusicPlayer : MonoBehaviour
         isPlaying = true;
         audioSource.PlayOneShot(clip);
     }
+
     /// <summary>
     /// Plays next song in playlist.
     /// </summary>
@@ -182,6 +197,7 @@ public class RobustMusicPlayer : MonoBehaviour
         currentTrackIndex = currentTrackIndex == playlist.Count - 1 ? 0 : currentTrackIndex + 1;
         Play();
     }
+
     /// <summary>
     /// Plays previous song in playlist.
     /// </summary>
@@ -192,6 +208,7 @@ public class RobustMusicPlayer : MonoBehaviour
         currentTrackIndex = currentTrackIndex == 0 ? playlist.Count - 1 : currentTrackIndex - 1;
         Play();
     }
+
     /// <summary>
     /// Adds the song to playlist.
     /// </summary>
@@ -200,6 +217,7 @@ public class RobustMusicPlayer : MonoBehaviour
     {
         playlist.Add(clip);
     }
+
     /// <summary>
     /// Removes indexed song from playlist.
     /// </summary>
@@ -212,18 +230,14 @@ public class RobustMusicPlayer : MonoBehaviour
                 PlayNext();
             else
                 currentTrackIndex = currentTrackIndex == playlist.Count - 1 ? 0 : currentTrackIndex + 1;
-        } else if(index < 0 || index >= playlist.Count)
+        }
+        else if (index < 0 || index >= playlist.Count)
         {
             print($"Index [{index}] is out of bounds.");
             return;
         }
         playlist.RemoveAt(index);
     }
-    #endregion
 
-
-
-
-
-
+    #endregion Methods, use this for controls
 }
