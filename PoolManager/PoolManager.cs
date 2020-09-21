@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PoolManager : MonoBehaviour
@@ -12,7 +13,7 @@ public class PoolManager : MonoBehaviour
     [SerializeField] private bool dynamicExtend = true;
 
     [Tooltip("Size of autoextended. Recommended to keep at 1.")]
-    [SerializeField] private int extendAmount = 1;
+    [SerializeField][Range(1, 1000)] private int extendAmount = 1;
 
     /// <summary>
     /// Then set to true will create empty game objects and parent pools to them.
@@ -36,7 +37,7 @@ public class PoolManager : MonoBehaviour
     /// Size for default pools. Can't be less than 1.
     /// </summary>
     [Tooltip("Default pool size.")]
-    [SerializeField] private int defaultSize = 10;
+    [SerializeField][Range(1, 1000)] private int defaultSize = 10;
 
     /// <summary>
     /// Dictionary of all created pools, using prefab id as key.
