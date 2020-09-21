@@ -80,6 +80,12 @@ public class PoolManager : MonoBehaviour
     }
 
     #region GET OBJECT FROM POOL
+
+    /// <summary>
+    /// Instantiate game object from pool.
+    /// </summary>
+    /// <param name="prefab">A prefab from which pool was created.</param>
+    /// <returns>Object from pool.</returns>
     public GameObject Get(GameObject prefab)
     {
         int key = prefab.GetInstanceID();
@@ -92,7 +98,7 @@ public class PoolManager : MonoBehaviour
         {
             if (dynamicExtend)
             {
-                CreatePool(prefab, 1);
+                CreatePool(prefab, extendAmount);
             }
             else
             {
@@ -106,6 +112,12 @@ public class PoolManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Instantiate game object from pool.
+    /// </summary>
+    /// <param name="prefab">A prefab from which pool was created.</param>
+    /// <param name="position">Sets position of returned object to Vector3.</param>
+    /// <returns>Object from pool.</returns>
     public GameObject Get(GameObject prefab, Vector3 position)
     {
         int key = prefab.GetInstanceID();
@@ -114,12 +126,11 @@ public class PoolManager : MonoBehaviour
             print("No pool with " + prefab.name + "'s instance ID has been found.");
             return null;
         }
-
         if (pools[key].Count == 0)
         {
             if (dynamicExtend)
             {
-                CreatePool(prefab, 1);
+                CreatePool(prefab, extendAmount);
             }
             else
             {
@@ -134,6 +145,13 @@ public class PoolManager : MonoBehaviour
         return obj;
     }
 
+    /// <summary>
+    /// Instantiate game object from pool.
+    /// </summary>
+    /// <param name="prefab">A prefab from which pool was created.</param>
+    /// <param name="position">Sets position of returned object to Vector3.</param>
+    /// <param name="rotation">Sets rotation of returned object to Quaternion.</param>
+    /// <returns>Object from pool.</returns>
     public GameObject Get(GameObject prefab, Vector3 position, Quaternion rotation)
     {
         int key = prefab.GetInstanceID();
@@ -142,12 +160,11 @@ public class PoolManager : MonoBehaviour
             print("No pool with " + prefab.name + "'s instance ID has been found.");
             return null;
         }
-
         if (pools[key].Count == 0)
         {
             if (dynamicExtend)
             {
-                CreatePool(prefab, 1);
+                CreatePool(prefab, extendAmount);
             }
             else
             {
@@ -165,10 +182,13 @@ public class PoolManager : MonoBehaviour
     #endregion
 
     #region RETURN OBJECT TO POOL
+    /// <summary>
+    /// Returns THIS game object to pool.
+    /// </summary>
     public void Return()
     {
         TryGetComponent<PoolObject>(out PoolObject poolObject);
-        if (poolObject == null)
+        if (poolObject == null || !pools.ContainsKey(poolObject.PoolKey))
         {
             print(name + "isn't part of any existing pool");
             return;
@@ -178,13 +198,16 @@ public class PoolManager : MonoBehaviour
         pools[poolObject.PoolKey].Enqueue(gameObject);
     }
 
+    /// <summary>
+    /// Returns game object to pool.
+    /// </summary>
+    /// <param name="objectToReturn"></param>
     public void Return(GameObject objectToReturn)
     {
         objectToReturn.TryGetComponent<PoolObject>(out PoolObject poolObject);
-        if (poolObject == null)
+        if (poolObject == null || !pools.ContainsKey(poolObject.PoolKey))
         {
             print(objectToReturn.name + "isn't part of any existing pool");
-            Destroy(gameObject);
             return;
         }
 
@@ -192,8 +215,17 @@ public class PoolManager : MonoBehaviour
         pools[poolObject.PoolKey].Enqueue(objectToReturn);
     }
 
+    /// <summary>
+    /// Returns game object to pool.
+    /// </summary>
+    /// <param name="poolObject"></param>
     public void Return(PoolObject poolObject)
     {
+        if (!pools.ContainsKey(poolObject.PoolKey))
+        {
+            print(poolObject.gameObject.name + "isn't part of any existing pool");
+            return;
+        }
         poolObject.gameObject.SetActive(false);
         pools[poolObject.PoolKey].Enqueue(poolObject.gameObject);
     }
