@@ -1,5 +1,5 @@
 # Unity Scripts Collection
- Miscenallious utility scripts for Unity, made to be flexible, plug and play. Mostly for annoying systems you don't want to waste a lot of time on then prototyping.
+ Miscenallious utility scripts for Unity, made to be flexible and easy-to-use. Mostly for annoying systems you don't want to waste a lot of time on then prototyping.
  <br>More detailed description in the scripts themselves.
 
 ### PlaylistManager
