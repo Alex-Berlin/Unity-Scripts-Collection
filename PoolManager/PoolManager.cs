@@ -9,34 +9,39 @@ public class PoolManager : MonoBehaviour
     /// Then set to true new objects will be added to the pool if trying to Get() from empty pool.
     /// </summary>
     [Tooltip("Then set to true new objects will be added to the pool if trying to Get() from empty pool.")]
-    [SerializeField] bool dynamicExtend = true;
+    [SerializeField] private bool dynamicExtend = true;
+
     [Tooltip("Size of autoextended. Recommended to keep at 1.")]
-    [SerializeField] int extendAmount = 1;
+    [SerializeField] private int extendAmount = 1;
+
     /// <summary>
     /// Then set to true will create empty game objects and parent pools to them.
     /// </summary>
     [Tooltip("Then set to true will create empty game objects and parent pools to them.")]
-    [SerializeField] bool poolParenting = true;
+    [SerializeField] private bool poolParenting = true;
+
     /// <summary>
     /// Automatically adds PoolObject components on all CreatePool requests. Not recommended.
     /// </summary>
     [Tooltip("Automatically adds PoolObject components on all CreatePool requests. Not recommended.")]
-    [SerializeField] bool autoAddComponent = false;
+    [SerializeField] private bool autoAddComponent = false;
+
     /// <summary>
     /// List of prefabs you want pooled at runtime.
     /// </summary>
     [Tooltip("List of prefabs to be pooled on Awake().")]
-    [SerializeField] List<GameObject> prefabsToPool = null;
+    [SerializeField] private List<GameObject> prefabsToPool = null;
+
     /// <summary>
     /// Size for default pools. Can't be less than 1.
     /// </summary>
     [Tooltip("Default pool size.")]
-    [SerializeField] int defaultSize = 10;
+    [SerializeField] private int defaultSize = 10;
 
     /// <summary>
     /// Dictionary of all created pools, using prefab id as key.
     /// </summary>
-    Dictionary<int, Queue<GameObject>> pools = new Dictionary<int, Queue<GameObject>>();
+    private Dictionary<int, Queue<GameObject>> pools = new Dictionary<int, Queue<GameObject>>();
 
     public void CreatePool(GameObject prefab, int size)
     {
@@ -51,11 +56,11 @@ public class PoolManager : MonoBehaviour
             {
                 print("Pooled objects need to have PoolObject component attached.");
                 return;
-            } else
+            }
+            else
             {
                 prefab.AddComponent<PoolObject>();
             }
-
         }
 
         int key = prefab.GetInstanceID();
@@ -109,7 +114,6 @@ public class PoolManager : MonoBehaviour
         GameObject obj = pools[key].Dequeue();
         obj.SetActive(true);
         return obj;
-
     }
 
     /// <summary>
@@ -179,9 +183,11 @@ public class PoolManager : MonoBehaviour
         obj.SetActive(true);
         return obj;
     }
-    #endregion
+
+    #endregion GET OBJECT FROM POOL
 
     #region RETURN OBJECT TO POOL
+
     /// <summary>
     /// Returns THIS game object to pool.
     /// </summary>
@@ -229,9 +235,11 @@ public class PoolManager : MonoBehaviour
         poolObject.gameObject.SetActive(false);
         pools[poolObject.PoolKey].Enqueue(poolObject.gameObject);
     }
-    #endregion
+
+    #endregion RETURN OBJECT TO POOL
 
     #region SETTING UP SINGLETON
+
     private void Awake()
     {
         if (Instance != null)
@@ -244,5 +252,6 @@ public class PoolManager : MonoBehaviour
             CreatePool(prefab, defaultSize);
         }
     }
-    #endregion
+
+    #endregion SETTING UP SINGLETON
 }

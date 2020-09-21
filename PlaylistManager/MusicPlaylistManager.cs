@@ -30,9 +30,12 @@ public class MusicPlaylistManager : MonoBehaviour
     #endregion Instructions
 
     [Header("Setup")]
-    public bool playOnAwake = true; //Starts playing music as soon as scene is loaded.
-    public bool autoShuffle = true; //Automatically shuffles playlist on scene load and playlist completion.
-    public bool isLooped = true; //Starts playing playlist from beggining then final track is finished.
+    [Tooltip("Starts playing music as soon as scene is loaded.")]
+    public bool playOnAwake = true; 
+    [Tooltip("Automatically shuffles playlist on scene load and playlist completion.")]
+    public bool autoShuffle = true; 
+    [Tooltip("Starts playing playlist from beggining then final track is finished.")]
+    public bool isLooped = true; 
 
     [Header("Track List")]
     [SerializeField] private List<AudioClip> playlist = null;
