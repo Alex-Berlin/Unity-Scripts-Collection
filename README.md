@@ -7,3 +7,6 @@ Script for music playlist management. You want a lot different tracks to play du
 
 ### PoolManager
 Simple and performant object pool manager. Put the PoolManager component in your scene, put the prefabs you want pooled into component and use Get() and Return() methods instead of Instantiate() and Destroy(). Every script and variable is explained and has tooltips. Doesn't ruin your hierarchy using parenting system.
+
+### RandomUtil
+Collection of various random generator methods. CoinFlip() returns true with 50% chance, GetRandomFrom(array) return random element from array/list/etc., Percentage(float chance) return true with chance%.
