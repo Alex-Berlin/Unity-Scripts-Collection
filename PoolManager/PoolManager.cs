@@ -68,7 +68,7 @@ public class PoolManager : MonoBehaviour
 
         if (!pools.ContainsKey(key))
         {
-            GameObject parentObject = Instantiate(new GameObject());
+            GameObject parentObject = new GameObject();
             parentObject.name = $"_{prefab.name} pool";
             parentObject.transform.parent = gameObject.transform;
 
